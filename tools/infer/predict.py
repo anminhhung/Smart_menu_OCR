@@ -32,9 +32,10 @@ import tools.infer.utility as utility
 import tools.infer.predict_rec as predict_rec
 import tools.infer.predict_det as predict_det
 import tools.infer.predict_cls as predict_cls
-from ppocr.utils.utility import get_image_file_list, check_and_read_gif
 from ppocr.utils.logging import get_logger
 from tools.infer.utility import get_rotate_crop_image
+from tools.infer.utils.matching import matching_row
+
 logger = get_logger()
 
 
@@ -65,14 +66,13 @@ class TextSystem(object):
             tmp_box = copy.deepcopy(dt_boxes[bno])
             img_crop = get_rotate_crop_image(ori_im, tmp_box)
             img_crop_list.append(img_crop)
+
         if self.use_angle_cls and cls:
             img_crop_list, angle_list, elapse = self.text_classifier(img_crop_list)
 
 
         rec_res, elapse = self.text_recognizer(img_crop_list)
 
-        if self.args.save_crop_res:
-            self.draw_crop_rec_res(self.args.crop_res_save_dir, img_crop_list, rec_res)
         filter_boxes, filter_rec_res = [], []
 
         for box, rec_result in zip(dt_boxes, rec_res):
@@ -80,6 +80,7 @@ class TextSystem(object):
             if score >= self.drop_score:
                 filter_boxes.append(box)
                 filter_rec_res.append(rec_result)
+
         return filter_boxes, filter_rec_res
 
 
@@ -107,42 +108,25 @@ def sorted_boxes(dt_boxes):
     return _boxes
 
 
-def main(args):
-    image_file_list = get_image_file_list(args.image_dir)
-    image_file_list = image_file_list[args.process_id::args.total_process_num]
+def predict(image, args):
     text_sys = TextSystem(args)
 
-    # warm up 10 times
-    if args.warmup:
-        img = np.random.uniform(0, 255, [640, 640, 3]).astype(np.uint8)
-        for i in range(10):
-            res = text_sys(img)
+    dt_boxes, rec_res = text_sys(image)
 
-    for idx, image_file in enumerate(image_file_list):
-        img = cv2.imread(image_file)
-
-        dt_boxes, rec_res = text_sys(img)
-
-        res = [{
+    res = [{
             "transcription": rec_res[idx][0],
             "points": np.array(dt_boxes[idx]).astype(np.int32).tolist(),
         } for idx in range(len(dt_boxes))]
+    
+    results = matching_row(res)
 
-        print(res)
-
+    return results
+    
 if __name__ == "__main__":
     args = utility.parse_args()
-    if args.use_mp:
-        p_list = []
-        total_process_num = args.total_process_num
-        for process_id in range(total_process_num):
-            cmd = [sys.executable, "-u"] + sys.argv + [
-                "--process_id={}".format(process_id),
-                "--use_mp={}".format(False)
-            ]
-            p = subprocess.Popen(cmd, stdout=sys.stdout, stderr=sys.stdout)
-            p_list.append(p)
-        for p in p_list:
-            p.wait()
-    else:
-        main(args)
+    image = cv2.imread('images/005.jpeg')
+    dict_res = predict(image, args)
+
+    results = matching_row(dict_res)
+    for result in results:
+        print(result)

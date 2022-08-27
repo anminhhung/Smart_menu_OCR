@@ -33,7 +33,7 @@ def str2bool(v):
 def init_args():
     parser = argparse.ArgumentParser()
     # params for prediction engine
-    parser.add_argument("--use_gpu", type=str2bool, default=True)
+    parser.add_argument("--use_gpu", type=str2bool, default=False)
     parser.add_argument("--use_xpu", type=str2bool, default=False)
     parser.add_argument("--ir_optim", type=str2bool, default=True)
     parser.add_argument("--use_tensorrt", type=str2bool, default=False)
@@ -44,7 +44,7 @@ def init_args():
     # params for text detector
     parser.add_argument("--image_dir", type=str)
     parser.add_argument("--det_algorithm", type=str, default='DB')
-    parser.add_argument("--det_model_dir", type=str)
+    parser.add_argument("--det_model_dir", type=str, default="models/model_det.onnx")
     parser.add_argument("--det_limit_side_len", type=float, default=960)
     parser.add_argument("--det_limit_type", type=str, default='max')
 
@@ -82,18 +82,18 @@ def init_args():
 
     # params for text recognizer
     parser.add_argument("--rec_algorithm", type=str, default='SVTR_LCNet')
-    parser.add_argument("--rec_model_dir", type=str)
+    parser.add_argument("--rec_model_dir", type=str, default="models/model_rec.onnx")
     parser.add_argument("--rec_image_shape", type=str, default="3, 48, 320")
     parser.add_argument("--rec_batch_num", type=int, default=6)
     parser.add_argument("--max_text_length", type=int, default=25)
     parser.add_argument(
         "--rec_char_dict_path",
         type=str,
-        default="./ppocr/utils/ppocr_keys_v1.txt")
+        default="models/ppocr_recog_dict.txt")
     parser.add_argument("--use_space_char", type=str2bool, default=True)
     parser.add_argument(
         "--vis_font_path", type=str, default="./doc/fonts/simfang.ttf")
-    parser.add_argument("--drop_score", type=float, default=0.5)
+    parser.add_argument("--drop_score", type=float, default=0.7)
 
     # params for e2e
     parser.add_argument("--e2e_algorithm", type=str, default='PGNet')
@@ -128,15 +128,15 @@ def init_args():
     parser.add_argument("--crop_res_save_dir", type=str, default="./output")
 
     # multi-process
-    parser.add_argument("--use_mp", type=str2bool, default=False)
-    parser.add_argument("--total_process_num", type=int, default=1)
+    parser.add_argument("--use_mp", type=str2bool, default=True)
+    parser.add_argument("--total_process_num", type=int, default=2)
     parser.add_argument("--process_id", type=int, default=0)
 
     parser.add_argument("--benchmark", type=str2bool, default=False)
     parser.add_argument("--save_log_path", type=str, default="./log_output/")
 
     parser.add_argument("--show_log", type=str2bool, default=True)
-    parser.add_argument("--use_onnx", type=str2bool, default=False)
+    parser.add_argument("--use_onnx", type=str2bool, default=True)
     return parser
 
 
