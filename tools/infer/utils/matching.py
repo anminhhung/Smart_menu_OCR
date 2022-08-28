@@ -14,10 +14,11 @@ from distutils import filelist
 from unidecode import unidecode
 
 class Processing():
-    def __init__(self, dict_res, path_txt_noise_word = "models/noise_word.txt"):
+    def __init__(self, dict_res, path_txt_noise_word = "models/noise_word.txt", use_fuzzy=True):
         list_input = dict_res
         self.infos = list_input
-        
+        self.use_fuzzy = use_fuzzy
+
         with open(path_txt_noise_word, encoding="utf8") as file:
             lines = file.readlines()
             list_noise = [line.rstrip() for line in lines]
@@ -36,10 +37,10 @@ class Processing():
             # print(name)
             if re.search("^\d+\s?[A-z]{2,}", st) \
                     and name.find('/') == -1 \
-                    or re.search("\d{5,}", st) \
                     or True in [char in self.lst_noise for char in name.split(' ')] \
                     or re.search("\d{1,2}[hH]", st) \
                     or re.search("CM$", st) \
+                    or re.search('^0+$', st) \
                     or re.search("^HOT$", st):
                 pass
             else:
@@ -87,10 +88,12 @@ class Processing():
                             else:
                                 check=0
                     else:
-                        check=0
+                      filter_list.append(re.sub('[^\d]+','',res[0]).strip())
+                      textbox_list.append(point)
 
                 if not check:
-                    name = fix_char_name(name)
+                    if not re.search('\s', name.strip()) and self.use_fuzzy:
+                        name = fix_char_name(name)
                     filter_list.append(name.strip())
                     textbox_list.append(point)
                 
@@ -157,20 +160,14 @@ class Post_processing_fuzzy():
 my_fuzzy_char = Post_processing_fuzzy()
 my_diff_char = Post_processing()
 
-lst_fuzzy = Queue()
-output = Queue()
-
-def fix_food_name(input):
-    Thread(target=my_fuzzy_char, args=(input, lst_fuzzy)).start()
-    Thread(target=my_diff_char, args=(input, lst_fuzzy.get(), output)).start()
-
-    return output.get()
+lst_fuzzy_char = Queue()
+output_char = Queue()
 
 def fix_char_name(input):
-    Thread(target=my_fuzzy_char, args=(input, lst_fuzzy)).start()
-    Thread(target=my_diff_char, args=(input, lst_fuzzy.get(), output)).start()
-
-    return output.get()
+    Thread(target=my_fuzzy_char, args=(input, lst_fuzzy_char)).start()
+    Thread(target=my_diff_char, args=(input, lst_fuzzy_char.get(), output_char)).start()
+    
+    return output_char.get()
 
 def buildAnnoyIndex(data,metric="manhattan",ntrees=10):
     f = data.shape[1]
@@ -210,7 +207,7 @@ def matching_row(dict_res):
             #     result_column.append(number_list[idx][0][:,-1])
             break
         
-        if number_list[idx+1][0][0,1] - number_list[idx][0][0,1] > 20: #20
+        if number_list[idx+1][0][0,1] - number_list[idx][0][0,1] > 10: #20
             if flag: 
                 result_column.append(number_list[idx+1][0][:,-1])
             else: 
@@ -225,14 +222,10 @@ def matching_row(dict_res):
     ######## Find x_textbox_list, y_textbox_list ########
     x_textbox_list = textbox_list[:,:,0]
     y_textbox_list = textbox_list[:,:,1]
-    # print('-'*60)
-    # print(x_textbox_list[:5])
-    # print('-'*60)
-    # print(y_textbox_list[:5])
 
     #####################################################################
-    threshsold_line = 15 #15
-    Nb_neighbors = 20 #10
+    threshsold_line = 17 #15
+    Nb_neighbors = 30 #10
     #####################
     result_row = [] 
 
@@ -244,15 +237,11 @@ def matching_row(dict_res):
         bucket_idx = annoy_idx.get_nns_by_vector(vector,Nb_neighbors)
         for idx in bucket_idx:
             # print(textbox_list[idx], filter_list[idx])
-            if abs(y_textbox_list[idx][0] - vector[0]) <= threshsold_line:
+            if min(abs((y_textbox_list[idx][:2].reshape(2,1) - vector[:2]).flatten())) <= threshsold_line:
                 output_row.append([textbox_list[idx], filter_list[idx]])
         output_row = sorted(output_row, key=lambda x: x[0][0,0])
         result_row.append(output_row)
 
-    # print(len(result_row))
-    # print(result_row[-5])
-    # print('-'*60)
-    # print(result_row[-2])
     #####################################################################
     results = []
     size = [[' M', ' L'],[' S', ' M', ' L'], [' S', ' M', ' L', ' XL'],\
@@ -264,35 +253,39 @@ def matching_row(dict_res):
         for idx, infos in enumerate(output_row):
             if not re.search('^\d{2,}', infos[1]):
                 if len(temp_price) != 0 and food != '':
-                    if len(temp_price) > 1:
+                    if 1 < len(temp_price) <= 3:
                         for i in range(len(temp_price)):
-                            # fixed_food = fix_food_name(food.strip()+size[len(temp_price)-2][i])
+                            temp_price[i] = list(map(int,re.findall(r'\d+', temp_price[i])))[0]
                             fixed_food = food.strip()+size[len(temp_price)-2][i]
-                            results.append([fixed_food, int(temp_price[i])])
-                    else:
-                        # food = fix_food_name(food)
-                        results.append([food.strip(), int(temp_price[0])])
+                            results.append([fixed_food, temp_price[i]])
+                    elif len(temp_price) == 1:
+                        temp_price[0] = list(map(int,re.findall(r'\d+', temp_price[0])))[0]
+                        results.append([food.strip(), temp_price[0]])
                     temp_price = []
                     food = ''
-                food += ' ' + infos[1]
+                if infos[0][0,0] - output_row[idx-1][0][0,0] < 400:
+                    food += ' ' + infos[1]
+                else:
+                    food = infos[1]
             else:
-                temp_price.append(infos[1])
+                if food != '':
+                    temp_price.append(infos[1])
+                else:
+                    temp_price = []
                 
             if idx==len(output_row)-1 and len(temp_price) != 0 and food != '':
-                if len(temp_price) > 1:                
+                if 1 < len(temp_price) <= 3:                
                     for i in range(len(temp_price)):
-                        # fixed_food = fix_food_name(food.strip()+size[len(temp_price)-2][i])
+                        temp_price[i] = list(map(int,re.findall(r'\d+', temp_price[i])))[0]
                         fixed_food = food.strip()+size[len(temp_price)-2][i]
-                        results.append([fixed_food, int(temp_price[i])])
-                else:
-                    # food = fix_food_name(food)
-                    results.append([food.strip(), int(temp_price[0])])
+                        results.append([fixed_food, temp_price[i]])
+                elif len(temp_price) == 1:
+                    temp_price[0] = list(map(int,re.findall(r'\d+', temp_price[0])))[0]
+                    results.append([food.strip(), temp_price[0]])
     
-    # for result in results:
-    #     print(result)
     return results
 
-# if __name__ == "__main__":
+# if _name_ == "_main_":
 #     results = matching_row(5)
 #     for result in results:
 #         print(result)

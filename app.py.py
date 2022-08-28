@@ -53,24 +53,24 @@ def infer():
     im_arr = np.frombuffer(img_bytes, dtype=np.uint8)  # im_arr is one-dim Numpy array
     img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
 
-    try:
-        pairs = predict(img, args)
-
-        response = {
-            "image_name": image_name,
-            "infers": []
+    # try:
+    pairs = predict(img, args)
+    print(pairs)
+    response = {
+        "image_name": image_name,
+        "infers": []
+    }
+    for pair in pairs:
+        dct = {
+            # 'food_name_en': pair[2],
+            'food_name_vi': pair[0],
+            'food_price': pair[1]
         }
-        for pair in pairs:
-            dct = {
-                # 'food_name_en': pair[2],
-                'food_name_vi': pair[0],
-                'food_price': pair[1]
-            }
-            response['infers'].append(dct)
-        return json.dumps(response)
+        response['infers'].append(dct)
+    return json.dumps(response)
         
-    except:
-        return None
+    # except:
+    #     return None
     
 
 if __name__ == "__main__":
