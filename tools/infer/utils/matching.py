@@ -14,7 +14,7 @@ from distutils import filelist
 from unidecode import unidecode
 
 class Processing():
-    def __init__(self, dict_res, path_txt_noise_word = "models/noise_word.txt", use_fuzzy=True):
+    def __init__(self, dict_res, path_txt_noise_word = "models/noise_word.txt", use_fuzzy=False):
         list_input = dict_res
         self.infos = list_input
         self.use_fuzzy = use_fuzzy
@@ -48,6 +48,11 @@ class Processing():
                 st = unidecode(name)
                 if re.search('(\.+)|(-\s)', st):
                     name = (re.sub('\.+|(-\s)','', name)).strip()
+                
+                ### Xoa dau (
+                st = unidecode(name)
+                if re.search('\(\d+\)', st):
+                    name = (re.sub('\(|\)','',name)).strip()
                 
                 ### Xoá địa chỉ
                 st = unidecode(name)
@@ -92,6 +97,8 @@ class Processing():
                       textbox_list.append(point)
 
                 if not check:
+                    if re.search('^X\s+|^\d+-', name):
+                        name = re.sub('^X\s+|^\d+-','',name)
                     if not re.search('\s', name.strip()) and self.use_fuzzy:
                         name = fix_char_name(name)
                     filter_list.append(name.strip())
@@ -101,7 +108,7 @@ class Processing():
 
 ### Difflib
 class Post_processing():
-    def __init__(self, path_dict_menu='models/ppocr_recog_dict.txt'):
+    def __init__(self, path_dict_menu='models/word_dict.txt'):
         self.seq = SequenceMatcher()
 
     def __call__(self, input, lines, output):
@@ -126,7 +133,7 @@ class Post_processing():
 
 ### Rapid fuzz
 class Post_processing_fuzzy():
-    def __init__(self, path_dict_menu='models/ppocr_recog_dict.txt'):
+    def __init__(self, path_dict_menu='models/word_dict.txt'):
         with open(path_dict_menu, 'rb') as fi:
             self.lines = fi.readlines()
 
@@ -203,8 +210,8 @@ def matching_row(dict_res):
     flag = 0
     for idx in range(len(number_list)):
         if idx + 1 >= len(number_list):
-            # if number_list[idx][0][0,1] - number_list[idx-1][0][0,1] > 20: #20
-            #     result_column.append(number_list[idx][0][:,-1])
+            if idx == 0:
+              result_column.append(number_list[0][0][:,-1])
             break
         
         if number_list[idx+1][0][0,1] - number_list[idx][0][0,1] > 10: #20
