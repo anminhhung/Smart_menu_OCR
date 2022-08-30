@@ -4,13 +4,18 @@ from flask import Flask, request, json
 import base64
 import numpy as np 
 import cv2 
+import os
+import tensorflow as tf
+import tensorflow_text as tf_text
 
 from tools.infer.predict import predict
 import tools.infer.utility as utility
+from tools.infer.utils.translate import translate
 
 app = Flask(__name__)
 
 args = utility.parse_args()
+translate_model = tf.saved_model.load(os.path.join("models", "translator"))
 
 # Health-checking method
 @app.route('/healthCheck', methods=['GET'])
@@ -53,24 +58,29 @@ def infer():
     im_arr = np.frombuffer(img_bytes, dtype=np.uint8)  # im_arr is one-dim Numpy array
     img = cv2.imdecode(im_arr, flags=cv2.IMREAD_COLOR)
 
-    # try:
-    pairs = predict(img, args)
-    print(pairs)
-    response = {
-        "image_name": image_name,
-        "infers": []
-    }
-    for pair in pairs:
-        dct = {
-            # 'food_name_en': pair[2],
-            'food_name_vi': pair[0],
-            'food_price': pair[1]
+    try:
+        pairs = predict(img, args)
+
+        response = {
+            "image_name": image_name,
+            "infers": []
         }
-        response['infers'].append(dct)
-    return json.dumps(response)
+        for pair in pairs:
+            food_name_en = translate(translate_model, pair[0])
+            food_name_en = food_name_en['text']
+            food_name_en = food_name_en.numpy()
+            food_name_en = food_name_en[0].decode("utf-8") 
+    
+            dct = {
+                'food_name_en': food_name_en,
+                'food_name_vi': pair[0],
+                'food_price': pair[1]
+            }
+            response['infers'].append(dct)
+        return json.dumps(response)
         
-    # except:
-    #     return None
+    except:
+        return None
     
 
 if __name__ == "__main__":
