@@ -1,8 +1,8 @@
 # Desctiption
-Input: Menu images
-Output: 
-- Matching food name and price
-- Translate Vietnamese to English
+- Input: Menu images
+- Output: 
+    - Merge food name and price
+    - Translate Vietnamese to English
 
 # Problem Solving Strategies
 
@@ -20,9 +20,9 @@ Output:
 - Post_processing: [Annoy](https://github.com/spotify/annoy), [
 RapidFuzz](https://github.com/maxbachmann/RapidFuzz?fbclid=IwAR0HffzFqj1WiUuXYITxFcxbZBokBKQmySXtiyaMYVk3E474GGIw2rZ569I), [FuzzyWuzzy](https://www.geeksforgeeks.org/fuzzywuzzy-python-library/), [Difflib](https://iq.opengenus.org/difflib-module-in-python/?fbclid=IwAR304LkvfwFGjzEQctCPJU4MW4bkHnzNw7MqULiuHYQpv8q7HFRrDy3_34k#:~:text=get_close_matches.%20Another%20simple%20yet%20powerful%20tool%20in%20difflib,function%20works%20like%20this%3A%20get_close_matches%28target_word%2C%20list_of_possibilities%2C%20n%3Dresult_limit%2C%20cutoff%29), [Threading](https://realpython.com/intro-to-python-threading/?fbclid=IwAR0WLMA-vz44Mzcv1ahdZpxlAtY2NjizfVntPTODkOV4n_x_s89MoJcr2oA), [Sort Point](https://dev-qa.com/2040644/the-best-way-to-sort-points-in-2d-by-table).
 
-- Image Rotation: [Document-Scanner-and-OCR](https://github.com/ankitshaw/Document-Scanner-and-OCR), [Document Scanner](https://github.com/MrGrayCode/OpenCV-Projects/tree/master/Document%20Scanner), [Deskew](https://github.com/sbrunner/deskew), [skew_correction](https://github.com/prajwalmylar/skew_correction)
+- Image Rotation: [Document-Scanner-and-OCR](https://github.com/ankitshaw/Document-Scanner-and-OCR), [Document Scanner](https://github.com/MrGrayCode/OpenCV-Projects/tree/master/Document%20Scanner), [Deskew](https://github.com/sbrunner/deskew), [skew_correction](https://github.com/prajwalmylar/skew_correction).
 
--Translation: [Hugging Face](https://github.com/huggingface/transformers?fbclid=IwAR03bGv-MoW9haC7LWIO5-i35q8hYCBVUWNbFl2NaTG8qI6ZT61Dpd5PPT4), [Machine Translation](https://github.com/3ba2ii/Machine-Translation-NLP).
+- Translation: [Hugging Face](https://github.com/huggingface/transformers?fbclid=IwAR03bGv-MoW9haC7LWIO5-i35q8hYCBVUWNbFl2NaTG8qI6ZT61Dpd5PPT4), [Machine Translation](https://github.com/3ba2ii/Machine-Translation-NLP).
 
 ---
 
@@ -31,10 +31,9 @@ RapidFuzz](https://github.com/maxbachmann/RapidFuzz?fbclid=IwAR0HffzFqj1WiUuXYIT
 VinAI Dataset
 
 | Detection | Recognition | Time with CPU |
-| :-- | :-: | :-: | :-: | :-: | :-: | :-: |
+| :-- | :-: | :-: |
 | [**EAST-ResNet50_vd**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/det/det_r50_vd_east.yml) | [**SVTR-Tiny**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/rec/rec_svtrnet.yml) | 18.0 *(s)* |
 | [**EAST-ResNet50_vd**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/det/det_r50_vd_east.yml) | [**PPOCRV3 (Quantization)**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/rec/PP-OCRv3/en_PP-OCRv3_rec.yml) | 16.0 *s* |
-|  |  |  |  |  |  |  |
 | [**MobileNetV3**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/det/det_mv3_east.yml) | [**SVTR-Tiny**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/rec/rec_svtrnet.yml) | 1280 | 13.0 *s* |
 | [**MobileNetV3**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/det/det_mv3_east.yml) | [**PPOCRV3 (Quantization)**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/rec/PP-OCRv3/en_PP-OCRv3_rec.yml) | 12.0 *s* |
 | [**PPOCRV3 (Convert ONNX)**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/det/ch_PP-OCRv3/ch_PP-OCRv3_det_student.yml) | [**PPOCRV3 (Convert ONNX)**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/rec/PP-OCRv3/en_PP-OCRv3_rec.yml) | 4.0 *s* |
@@ -45,10 +44,9 @@ VinAI Dataset
 1. Text Detection: [Text Detection](https://github.com/anminhhung/Smart_menu_OCR/blob/master/notebook/PPOCR_Detection.ipynb). 
 2. Text Recognition: [Text Recognition](https://github.com/anminhhung/Smart_menu_OCR/blob/master/notebook/PPOCR_Recognition.ipynb). 
 
----
-
-# Inference (Convert ONNX): 
-    - Link Colab: [link](https://github.com/anminhhung/Smart_menu_OCR/blob/master/notebook/PPOCR_Inference.ipynb). 
+# Inference (Convert ONNX)
+1. Colab
+    - Link colab: [link](https://github.com/anminhhung/Smart_menu_OCR/blob/master/notebook/PPOCR_Inference.ipynb).  
 
 ---
 
