@@ -7,8 +7,8 @@ Global:
   save_model_dir: ./output/ch_PP-OCR_V3_det/
   save_epoch_step: 100
   eval_batch_step:
-  - 0
-  - 400
+  - 4000
+  - 5000
   cal_metric_during_train: false
   pretrained_model: null
   checkpoints: null
@@ -65,9 +65,9 @@ Metric:
 Train:
   dataset:
     name: SimpleDataSet
-    data_dir: ./train_data/icdar2015/text_localization/
+    data_dir: /content/Dataset/
     label_file_list:
-      - ./train_data/icdar2015/text_localization/train_icdar2015_label.txt
+      - /content/train_datadet.txt
     ratio_list: [1.0]
     transforms:
     - DecodeImage:
@@ -129,9 +129,9 @@ Train:
 Eval:
   dataset:
     name: SimpleDataSet
-    data_dir: ./train_data/icdar2015/text_localization/
+    data_dir: /content/Dataset/
     label_file_list:
-      - ./train_data/icdar2015/text_localization/test_icdar2015_label.txt
+      - /content/val_datadet.txt
     transforms:
     - DecodeImage:
         img_mode: BGR
