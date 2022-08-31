@@ -1,12 +1,10 @@
-# Desctiption
+# Description
 - Input: Menu images
 - Output: 
     - Merge food name and price
     - Translate Vietnamese to English
 
-# Problem Solving Strategies
-
-![](./images/Strategies.png)
+![](./images/Visualize.jpeg)
 
 ---
 
@@ -26,6 +24,12 @@ RapidFuzz](https://github.com/maxbachmann/RapidFuzz?fbclid=IwAR0HffzFqj1WiUuXYIT
 
 ---
 
+# Problem Solving Strategies
+
+![](./images/Strategies.png)
+
+---
+
 # Performance
 
 VinAI Dataset
@@ -36,7 +40,7 @@ VinAI Dataset
 | [**EAST-ResNet50_vd**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/det/det_r50_vd_east.yml) | [**PPOCRV3 (Quantization)**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/rec/PP-OCRv3/en_PP-OCRv3_rec.yml) | 16.0 *(s)* |
 | [**MobileNetV3**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/det/det_mv3_east.yml) | [**SVTR-Tiny**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/rec/rec_svtrnet.yml) | 13.0 *(s)* |
 | [**MobileNetV3**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/det/det_mv3_east.yml) | [**PPOCRV3 (Quantization)**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/rec/PP-OCRv3/en_PP-OCRv3_rec.yml) | 12.0 *(s)* |
-| [**PPOCRV3 (Convert ONNX)**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/det/ch_PP-OCRv3/ch_PP-OCRv3_det_student.yml) | [**PPOCRV3 (Convert ONNX)**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/rec/PP-OCRv3/en_PP-OCRv3_rec.yml) | 4.0 *(s)* |
+| [**PPOCRV3 (Convert ONNX)**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/det/ch_PP-OCRv3/ch_PP-OCRv3_det_student.yml) | [**PPOCRV3 (Convert ONNX)**](https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.6/configs/rec/PP-OCRv3/en_PP-OCRv3_rec.yml) | 3.0 *(s)* |
 
 ---
 
